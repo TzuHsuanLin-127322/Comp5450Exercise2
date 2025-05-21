@@ -1,5 +1,5 @@
 export interface InboxModel {
-    inboxId: string,
+    inboxId?: string,
     inboxName: string,
     iconSymbol: string
     iconColor: string

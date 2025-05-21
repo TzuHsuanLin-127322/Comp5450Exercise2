@@ -1,8 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router, useNavigation } from "expo-router";
-import { useEffect } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
-import { buttonBaseStyle } from "./components/commonStyle";
+import { useNavigation } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Text, View } from "react-native";
+import AddEditInboxModal from "./addEditInboxModal";
+import BaseButton from "./components/baseButton";
 import CreateButton from "./components/createButton";
 import { useInboxViewModel } from "./useInboxViewModel";
 
@@ -12,6 +13,8 @@ export default function Inbox() {
   useEffect(()=> {
     navigation.setOptions({title: "Inbox"})
   })
+
+  const [isAddEditInboxModalVisible, setIsAddEditInboxModalVisible] = useState(false)
 
   const {
     inbox,
@@ -25,7 +28,7 @@ export default function Inbox() {
 
   const onCreateInboxPress = () => {
     console.log("onCreateInboxPress")
-    router.push
+    setIsAddEditInboxModalVisible(true)
   }
 
   const content = inbox.length == 0 ?
@@ -39,19 +42,17 @@ export default function Inbox() {
         }}
       >
         <Text>No inbox available, let's create one!</Text>
-        <TouchableOpacity
-          style={{...buttonBaseStyle, marginVertical: 8}}
+        <BaseButton
+          style={{marginTop: 8}}
+          title="Create Inbox"
           onPress={onCreateInboxPress}
-        >
-          <Ionicons name="add" color={'white'} size={16}/>
-          <View style={{width: 8}}/>
-          <Text style={{color: 'white'}}>Create Inbox</Text>
-        </TouchableOpacity>
+          icon={<Ionicons name="add" color={'white'} size={16}/>}
+        />
       </View>
     ) : (
-      <>
+      <View>
         <Text>Has Content, in construction</Text>
-      </>
+      </View>
     )
   // TODO: Add Inbox floating action button
   // TODO: Add Inbox item
@@ -64,6 +65,14 @@ export default function Inbox() {
     >
       {content}
       <CreateButton onPress={onCreateInboxPress}/>
+      <AddEditInboxModal
+        initialInbox={undefined}
+        onClosePressed={() => setIsAddEditInboxModalVisible(false)}
+        onSavePressed={() => {}}
+        visible={isAddEditInboxModalVisible}
+        backdropColor={'#00000044'}
+        animationType="fade"
+      />
     </View>
   );
 }

@@ -1,12 +1,16 @@
 import { ViewStyle } from "react-native";
 
+export const centered: ViewStyle = {
+    justifyContent: 'center',
+    alignItems: 'center',
+}
+
 export const buttonBaseStyle: ViewStyle = {
+    ...centered,
     backgroundColor: "orange",
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
     paddingVertical: 8
 }
 
