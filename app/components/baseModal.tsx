@@ -14,12 +14,13 @@ const BaseModal: React.FC<BaseModalProps> = (props: BaseModalProps) => {
     >
       <TouchableWithoutFeedback onPress={onRequestClose}>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <View style={[style, { padding: 16, backgroundColor: 'white', maxWidth: '80%', borderRadius: 16 }]}>
-            {props.children}
-          </View>
+          <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+            <View style={[style, { padding: 16, backgroundColor: 'white', maxWidth: '80%', borderRadius: 16 }]}>
+              {props.children}
+            </View>
+          </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
-
     </Modal>
   )
 }
