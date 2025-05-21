@@ -121,6 +121,7 @@ const AddEditInboxModal: React.FC<AddEditInboxModalProps> = (props: AddEditInbox
 
   const saveButton = (
     <BaseButton
+      disabled={inboxName.length === 0}
       style={{ marginTop: 8 }}
       title="Save"
       onPress={() => {

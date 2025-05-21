@@ -6,6 +6,10 @@ export const centered: ViewStyle = {
     alignItems: 'center',
 }
 
+export const buttonDisabledStyle: ViewStyle = {
+    backgroundColor: 'gray'
+}
+
 export const buttonBaseStyle: ViewStyle = {
     ...centered,
     backgroundColor: "orange",

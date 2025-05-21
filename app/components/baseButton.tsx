@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity, TouchableOpacityProps } from "react-native";
-import { buttonBaseStyle } from "./commonStyle";
+import { buttonBaseStyle, buttonDisabledStyle } from "./commonStyle";
 
 type BaseButtonProps = TouchableOpacityProps & {
     title: string,
@@ -7,9 +7,9 @@ type BaseButtonProps = TouchableOpacityProps & {
 }
 
 const BaseButton: React.FC<BaseButtonProps> = (props: BaseButtonProps) => {
-    const {style, title, icon, ...others} = props
+    const {style, title, icon, disabled, ...others} = props
     return (
-        <TouchableOpacity {...others} style={[buttonBaseStyle, style]}>
+        <TouchableOpacity {...others} style={[buttonBaseStyle, style, disabled ? buttonDisabledStyle : {}]}>
             {icon}
             <Text style={{color: 'white', marginLeft: icon ? 8 : 0}}>{title}</Text>
         </TouchableOpacity>
