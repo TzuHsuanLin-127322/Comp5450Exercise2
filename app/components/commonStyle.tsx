@@ -1,6 +1,7 @@
 import { ViewStyle } from "react-native";
 
 export const centered: ViewStyle = {
+    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
 }
@@ -20,6 +21,6 @@ export const buttonCreateFABStyle: ViewStyle = {
     paddingHorizontal: 0,
     paddingVertical: 0,
     position: 'absolute',
-    bottom: 16,
+    bottom: 32,
     right: 16
 }
