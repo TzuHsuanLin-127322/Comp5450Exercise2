@@ -147,18 +147,18 @@ export default function Inbox() {
       visible={isIndoxLongClickMenuVisible} style={{ width: '80%' }}
       onRequestClose={onLongClickMenuClose}
     >
-      <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Selected Inbox: {selectedInbox?.inboxName}</Text>
+      <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Inbox Selected: {selectedInbox?.inboxName}</Text>
         <TouchableOpacity
           style={{ margin: 16 }}
           onPress={onEditInboxPress}
         >
-          <Text style={{ fontSize: 14}}>Edit</Text>
+          <Text style={{ fontSize: 16, fontWeight: 'bold'}}>Edit</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={{ margin: 16 }}
           onPress={() => setIsConfirmDeleteInboxModalVisible(true)}
         >
-          <Text style={{ fontSize: 14}}>Delete</Text>
+          <Text style={{ fontSize: 16, fontWeight: 'bold'}}>Delete</Text>
         </TouchableOpacity>
     </BaseModal>
   )
@@ -174,13 +174,13 @@ export default function Inbox() {
         <BaseButton
           title="Delete"
           style={{ backgroundColor: 'transparent'}}
-          textStyle={{color: 'orange'}}
+          textStyle={{color: 'darkorange', fontWeight: 'bold'}}
           onPress={onConfirmDeleteInboxPress}
         />
         <BaseButton
           title="Cancel"
           style={{ backgroundColor: 'transparent'}}
-          textStyle={{color: 'orange'}}
+          textStyle={{color: 'darkorange', fontWeight: 'bold'}}
           onPress={() => setIsConfirmDeleteInboxModalVisible(false)}
         />
       </View>
