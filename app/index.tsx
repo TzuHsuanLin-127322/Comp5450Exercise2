@@ -20,6 +20,7 @@ export default function Inbox() {
 
   const [isAddEditInboxModalVisible, setIsAddEditInboxModalVisible] = useState(false)
   const [isIndoxLongClickMenuVisible, setIsIndoxLongClickMenuVisible] = useState(false)
+  const [isConfirmDeleteInboxModalVisible, setIsConfirmDeleteInboxModalVisible] = useState(false)
   const [selectedInbox, setSelectedInbox] = useState<InboxModel | null>(null)
 
   const {
@@ -60,12 +61,16 @@ export default function Inbox() {
     setIsAddEditInboxModalVisible(true)
   }
 
-  const onDeleteInboxPress = () => {
+  const onConfirmDeleteInboxPress = () => {
+    setIsConfirmDeleteInboxModalVisible(false)
     setIsIndoxLongClickMenuVisible(false)
     if (selectedInbox) {
       deleteInbox(selectedInbox)
       setSelectedInbox(null)
     }
+  }
+
+  const onCancelDeleteInboxPress = () => {
   }
 
   const onLongClickMenuClose = () => {
@@ -151,10 +156,35 @@ export default function Inbox() {
         </TouchableOpacity>
         <TouchableOpacity
           style={{ margin: 16 }}
-          onPress={onDeleteInboxPress}
+          onPress={() => setIsConfirmDeleteInboxModalVisible(true)}
         >
           <Text style={{ fontSize: 14}}>Delete</Text>
         </TouchableOpacity>
+    </BaseModal>
+  )
+
+  const confirmDeleteModal = (
+    <BaseModal
+      visible={isConfirmDeleteInboxModalVisible}
+      onRequestClose={() => setIsConfirmDeleteInboxModalVisible(false)}
+    >
+      <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Confirm Delete Inbox</Text>
+      <Text style={{ marginVertical: 16 }}>Are you sure you want to delete inbox {selectedInbox?.inboxName}? You will lose all data associated with it.</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+        <BaseButton
+          title="Delete"
+          style={{ backgroundColor: 'transparent'}}
+          textStyle={{color: 'orange'}}
+          onPress={onConfirmDeleteInboxPress}
+        />
+        <BaseButton
+          title="Cancel"
+          style={{ backgroundColor: 'transparent'}}
+          textStyle={{color: 'orange'}}
+          onPress={() => setIsConfirmDeleteInboxModalVisible(false)}
+        />
+      </View>
+      
     </BaseModal>
   )
 
@@ -164,6 +194,7 @@ export default function Inbox() {
       <CreateButton onPress={onCreateInboxPress} />
       {addEditModal}
       {longClickMenu}
+      {confirmDeleteModal}
     </View>
   );
 }
