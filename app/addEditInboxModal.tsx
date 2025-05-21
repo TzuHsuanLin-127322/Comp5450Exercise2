@@ -1,15 +1,16 @@
 import { InboxModel } from "@/models/Inbox";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { Modal, ModalProps, Text, TextInput, TouchableOpacity, View, ViewStyle } from "react-native";
+import { ModalProps, Text, TextInput, TouchableOpacity, View, ViewStyle } from "react-native";
 import ColorPicker from "react-native-wheel-color-picker";
 import EmojiPicker, { EmojiType } from "rn-emoji-keyboard";
 import BaseButton from "./components/baseButton";
+import BaseModal from "./components/baseModal";
 import { centered } from "./components/commonStyle";
 import InboxIcon from "./inboxIcon";
 
 type AddEditInboxModalProps = ModalProps & {
-  initialInbox?: InboxModel,
+  initialInbox?: InboxModel | null,
   onClosePressed: () => void,
   onSavePressed: (inbox: InboxModel) => void
 }
@@ -35,13 +36,13 @@ const AddEditInboxModal: React.FC<AddEditInboxModalProps> = (props: AddEditInbox
   const [isColorSelectorVisible, setIsColorSelectorVisible] = useState(false)
   const [inboxName, setInboxName] = useState(initialInbox?.inboxName ?? '')
   const [iconColor, setIconColor] = useState(initialInbox?.iconColor ?? '#FFFFFF')
-  const [iconSymbol, setIconSymbol] = useState(initialInbox?.iconSymbol ?? ' ')
+  const [iconSymbol, setIconSymbol] = useState(initialInbox?.iconSymbol ?? '')
 
   useEffect(() => {
     if (visible) {
       setInboxName(initialInbox?.inboxName ?? '')
       setIconColor(initialInbox?.iconColor ?? '#FFFFFF')
-      setIconSymbol(initialInbox?.iconSymbol ?? ' ')
+      setIconSymbol(initialInbox?.iconSymbol ?? '')
       setIsEmojiSelectorVisible(false)
       setIsColorSelectorVisible(false)
     }
@@ -127,9 +128,9 @@ const AddEditInboxModal: React.FC<AddEditInboxModalProps> = (props: AddEditInbox
       onPress={() => {
         onSavePressed({
           inboxId: initialInbox?.inboxId,
-          inboxName: initialInbox?.inboxName ?? inboxName,
-          iconColor: initialInbox?.iconColor ?? iconColor,
-          iconSymbol: initialInbox?.iconSymbol ?? iconSymbol
+          inboxName,
+          iconColor,
+          iconSymbol,
         })
       }}
     />
@@ -147,20 +148,17 @@ const AddEditInboxModal: React.FC<AddEditInboxModalProps> = (props: AddEditInbox
   )
 
   return (
-    <Modal {...others} visible={visible}>
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <View style={[{ padding: 16, backgroundColor: 'white', maxWidth: '80%', borderRadius: 16 }]}>
-          {titleBar}
-          {inboxNameInput}
-          {emojiColorSelection}
-          {colorPickerView}
-          {iconPreview}
-          {saveButton}
-        </View>
-      </View>
+    <BaseModal {...others} visible={visible}>
+      {titleBar}
+      {inboxNameInput}
+      {emojiColorSelection}
+      {colorPickerView}
+      {iconPreview}
+      {saveButton}
       {emojiPickerModal}
-    </Modal>
+    </BaseModal>
   )
+
 }
 
 export default AddEditInboxModal

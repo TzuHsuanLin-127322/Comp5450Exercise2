@@ -55,11 +55,29 @@ export const useInboxViewModel = () => {
         }
     }
 
+    const deleteInbox = async (inboxToBeDeleted: InboxModel) => {
+        console.log("deleteInbox", inboxToBeDeleted.inboxId)
+        setApiState(ApiState.Loading)
+        try{
+            setInbox(inbox.filter(inbox => inbox.inboxId !== inboxToBeDeleted.inboxId))
+            setApiState(ApiState.Success)
+        } catch (error) {
+            // setError(error.msg)
+            setApiState(ApiState.Error)
+        }
+    }
+
     useEffect(() => {
         fetchInbox()
     }, [])
 
     return({
-        inbox, apiState, error, fetchInbox, addInbox, editInbox
+        apiState,
+        error,
+        inbox,
+        fetchInbox,
+        addInbox,
+        editInbox,
+        deleteInbox
     })
 }

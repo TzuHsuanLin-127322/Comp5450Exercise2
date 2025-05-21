@@ -2,10 +2,11 @@ import { InboxModel } from "@/models/Inbox";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import 'react-native-get-random-values';
 import AddEditInboxModal from "./addEditInboxModal";
 import BaseButton from "./components/baseButton";
+import BaseModal from "./components/baseModal";
 import CreateButton from "./components/createButton";
 import InboxIcon from "./inboxIcon";
 import { useInboxViewModel } from "./useInboxViewModel";
@@ -13,11 +14,13 @@ import { useInboxViewModel } from "./useInboxViewModel";
 export default function Inbox() {
   const navigation = useNavigation()
 
-  useEffect(()=> {
-    navigation.setOptions({title: "Inbox"})
+  useEffect(() => {
+    navigation.setOptions({ title: "Inbox" })
   })
 
   const [isAddEditInboxModalVisible, setIsAddEditInboxModalVisible] = useState(false)
+  const [isIndoxLongClickMenuVisible, setIsIndoxLongClickMenuVisible] = useState(false)
+  const [selectedInbox, setSelectedInbox] = useState<InboxModel | null>(null)
 
   const {
     inbox,
@@ -25,10 +28,11 @@ export default function Inbox() {
     error,
     addInbox,
     fetchInbox,
-    editInbox
+    editInbox,
+    deleteInbox
   } = useInboxViewModel()
 
-  if(error) {
+  if (error) {
     // TODO: Return error display
   }
 
@@ -37,6 +41,46 @@ export default function Inbox() {
     setIsAddEditInboxModalVisible(true)
   }
 
+  const onAddEditInboxClose = () => {
+    setIsAddEditInboxModalVisible(false)
+    setSelectedInbox(null)
+  }
+
+  const onInboxPress = (inbox: InboxModel) => {
+    console.log("onInboxPress", inbox)
+  }
+
+  const onInboxLongPress = (inbox: InboxModel) => {
+    setIsIndoxLongClickMenuVisible(true)
+    setSelectedInbox(inbox)
+  }
+
+  const onEditInboxPress = () => {
+    setIsIndoxLongClickMenuVisible(false)
+    setIsAddEditInboxModalVisible(true)
+  }
+
+  const onDeleteInboxPress = () => {
+    setIsIndoxLongClickMenuVisible(false)
+    if (selectedInbox) {
+      deleteInbox(selectedInbox)
+      setSelectedInbox(null)
+    }
+  }
+
+  const onLongClickMenuClose = () => {
+    setIsIndoxLongClickMenuVisible(false)
+    setSelectedInbox(null)
+  }
+
+  const onAddEditInboxSavePressed = (newInbox: InboxModel) => {
+    if (!newInbox.inboxId) {
+      addInbox(newInbox)
+    } else {
+      editInbox(newInbox)
+    }
+    onAddEditInboxClose()
+  }
 
   const content = inbox.length == 0 ?
     (
@@ -50,62 +94,76 @@ export default function Inbox() {
       >
         <Text>No inbox available, let's create one!</Text>
         <BaseButton
-          style={{marginTop: 8}}
+          style={{ marginTop: 8 }}
           title="Create Inbox"
           onPress={onCreateInboxPress}
-          icon={<Ionicons name="add" color={'white'} size={16}/>}
+          icon={<Ionicons name="add" color={'white'} size={16} />}
         />
       </View>
     ) : (
       <FlatList
         data={inbox.length % 2 == 0 ? inbox : [...inbox, null]}
         numColumns={2}
-        ListFooterComponent={<View style={{height: 100}}/>}
-        renderItem={({item}) => {
-          if(item == null) {
+        ListFooterComponent={<View style={{ height: 100 }} />}
+        renderItem={({ item }) => {
+          if (item == null) {
             return (
-              <View style={{flex: 1, margin: 8, padding: 8}}/>
+              <View style={{ flex: 1, margin: 8, padding: 8 }} />
             )
           }
           return (
-            <View key={item.inboxId} style={{padding: 8, borderWidth: 1, borderColor: 'gray', borderRadius: 8, margin: 8, backgroundColor: 'white', flex: 1}}>
+            <TouchableOpacity
+              onPress={() => onInboxPress(item)}
+              onLongPress={() => onInboxLongPress(item)}
+              style={{ padding: 8, borderWidth: 1, borderColor: 'gray', borderRadius: 8, margin: 8, backgroundColor: 'white', flex: 1 }}
+            >
               <InboxIcon
                 iconColor={item.iconColor}
                 iconSymbol={item.iconSymbol}
                 inboxName={item.inboxName}
               />
-            </View>
+            </TouchableOpacity>
           )
         }}
       />
     )
-  // TODO: Add Inbox floating action button
-  // TODO: Add Inbox item
-  return (
-    <View
-      style={{
-        flex: 1,
-        // backgroundColor: 'green'
-      }}
+
+  const addEditModal = (
+    <AddEditInboxModal
+      initialInbox={selectedInbox}
+      onClosePressed={onAddEditInboxClose}
+      onSavePressed={onAddEditInboxSavePressed}
+      visible={isAddEditInboxModalVisible}
+    />
+  )
+
+  const longClickMenu = (
+    <BaseModal
+      visible={isIndoxLongClickMenuVisible} style={{ width: '80%' }}
+      onRequestClose={onLongClickMenuClose}
     >
+      <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Selected Inbox: {selectedInbox?.inboxName}</Text>
+        <TouchableOpacity
+          style={{ margin: 16 }}
+          onPress={onEditInboxPress}
+        >
+          <Text style={{ fontSize: 14}}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ margin: 16 }}
+          onPress={onDeleteInboxPress}
+        >
+          <Text style={{ fontSize: 14}}>Delete</Text>
+        </TouchableOpacity>
+    </BaseModal>
+  )
+
+  return (
+    <View style={{ flex: 1, }}>
       {content}
-      <CreateButton onPress={onCreateInboxPress}/>
-      <AddEditInboxModal
-        initialInbox={undefined}
-        onClosePressed={() => setIsAddEditInboxModalVisible(false)}
-        onSavePressed={(newInbox: InboxModel) => {
-          console.log("onSavePressed", newInbox)
-          if (!newInbox.inboxId) {
-            addInbox(newInbox)
-          } else {
-            editInbox(newInbox)
-          }
-          setIsAddEditInboxModalVisible(false)
-        }}
-        visible={isAddEditInboxModalVisible}
-        backdropColor={'#00000044'}
-        animationType="fade"
-      />
+      <CreateButton onPress={onCreateInboxPress} />
+      {addEditModal}
+      {longClickMenu}
     </View>
   );
 }
