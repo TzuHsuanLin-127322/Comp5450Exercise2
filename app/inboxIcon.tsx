@@ -17,7 +17,7 @@ const InboxIcon: React.FC<InboxIconProps> = (props: InboxIconProps) => {
             <View style={[centered,{aspectRatio: 1, backgroundColor: iconColor, borderRadius: '50%', padding: '12%', elevation: 4}]}>
                 <Text style={[{fontSize: 50, }, iconStyle]}>{iconSymbol}</Text>
             </View>
-            <Text style={[{fontSize: 24, fontWeight: 'bold', marginTop: 8}, inboxNameStyle]}>{inboxName}</Text>
+            <Text style={[{textAlign: 'center', fontSize: 24, fontWeight: 'bold', marginTop: 8}, inboxNameStyle]}>{inboxName}</Text>
         </View>
     )
 }
