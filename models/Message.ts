@@ -1,6 +1,6 @@
 export interface MessageModel {
     messageId: string;
     message: string;
-    createdAt: Date;
+    messageTime: Date;
     inboxId: string;
 }

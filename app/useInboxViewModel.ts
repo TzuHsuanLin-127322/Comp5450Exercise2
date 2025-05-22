@@ -2,7 +2,7 @@ import { InboxModel } from '@/models/Inbox'
 import {
     addInbox as addInboxToService,
     deleteInbox as deleteInboxToService,
-    fetchInbox as fetchInboxFromService,
+    fetchInboxList as fetchInboxListFromService,
     updateInbox as updateInboxToService
 } from '@/models/mockData'
 import { useEffect, useState } from 'react'
@@ -13,10 +13,10 @@ export const useInboxViewModel = () => {
     const [apiState, setApiState] = useState(ApiState.Initial)
     const [error, setError] = useState(null)
 
-    const fetchInbox = async () => {
+    const fetchInboxList = async () => {
         // console.log("fetchInbox")
         setApiState(ApiState.Loading)
-        const result = await fetchInboxFromService()
+        const result = await fetchInboxListFromService()
         if (result) {
             setInbox(result)
             setApiState(ApiState.Success)
@@ -30,7 +30,7 @@ export const useInboxViewModel = () => {
         setApiState(ApiState.Loading)
         const result = await addInboxToService(newInbox)
         if (result) {
-            await fetchInbox()
+            await fetchInboxList()
         } else {
             setApiState(ApiState.Error)
         }
@@ -41,7 +41,7 @@ export const useInboxViewModel = () => {
         setApiState(ApiState.Loading)
         const result = await updateInboxToService(updatedInbox)
         if (result) {
-            await fetchInbox()
+            await fetchInboxList()
         } else {
             // setError(error.msg)
             setApiState(ApiState.Error)
@@ -53,21 +53,21 @@ export const useInboxViewModel = () => {
         setApiState(ApiState.Loading)
         const result = await deleteInboxToService(inboxToBeDeleted)
         if (result) {
-            await fetchInbox()
+            await fetchInboxList()
         } else {
             setApiState(ApiState.Error)
         }
     }
 
     useEffect(() => {
-        fetchInbox()
+        fetchInboxList()
     }, [])
 
     return({
         apiState,
         error,
         inbox,
-        fetchInbox,
+        fetchInbox: fetchInboxList,
         addInbox,
         editInbox,
         deleteInbox
