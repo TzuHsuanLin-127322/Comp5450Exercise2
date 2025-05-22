@@ -3,6 +3,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Keyboard, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
+import BaseButton from "../components/baseButton";
+import BaseModal from "../components/baseModal";
 import { useMessageViewModel } from "./useMessageViewModels";
 
 export default function Message() {
@@ -10,8 +12,13 @@ export default function Message() {
   const navigation = useNavigation();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [message, setMessage] = useState("");
+  const [isOptionsModalVisible, setIsOptionsModalVisible] = useState(false)
+  const [isInEditMode, setIsInEditMode] = useState(false)
+  const [isConfirmDeleteModalVisible, setIsConfirmDeleteModalVisible] = useState(false)
+  const [selectedMessage, setSelectedMessage] = useState<MessageModel | null>(null)
   const messageListRef = useRef<FlatList<MessageModel>>(null);
 
+  // Set navigation options once
   useEffect(() => {
     navigation.setOptions({
       title: title as string,
@@ -64,8 +71,52 @@ export default function Message() {
   } = useMessageViewModel(inboxId as string)
 
   const sendMessage = () => {
-    createMessage(message);
+    if (isInEditMode && selectedMessage) {
+      updateMessage({
+        messageId: selectedMessage?.messageId,
+        message: message,
+        messageTime: selectedMessage?.messageTime,
+        inboxId: selectedMessage?.inboxId
+      })
+    } else {
+      createMessage(message);
+    }
     setMessage("");
+    setIsInEditMode(false);
+  }
+
+  const onMessageLongPress = (message: MessageModel) => {
+    console.log("onMessageLongPress", message);
+    setSelectedMessage(message);
+    setIsOptionsModalVisible(true);
+  }
+
+  const onOptionsModalEditSelected = () => {
+    setIsInEditMode(true)
+    setMessage(selectedMessage?.message || "")
+    setIsOptionsModalVisible(false)
+  }
+
+  const onOptionsModalDeleteSelected = () => {
+    setIsConfirmDeleteModalVisible(true);
+  }
+
+  const closeOptionsModal = () => {
+    setIsOptionsModalVisible(false);
+    setSelectedMessage(null);
+  }
+
+  const closeConfirmDeleteModal = () => {
+    setIsConfirmDeleteModalVisible(false);
+  }
+
+  const onConfirmDeleteModalConfirm = () => {
+    setIsConfirmDeleteModalVisible(false);
+    setIsOptionsModalVisible(false);
+    if (selectedMessage) {
+      deleteMessage(selectedMessage);
+      setSelectedMessage(null);
+    }
   }
 
   const messageContent = messages.length == 0 ? (
@@ -78,17 +129,21 @@ export default function Message() {
       style={{paddingHorizontal: 16}}
       data={messages}
       renderItem={({ item }) => {return (
-        <View style={{
-          borderWidth: 1,
-          borderColor: "gray",
-          borderRadius: 16,
-          padding: 8,
-          backgroundColor: "white",
-          marginVertical: 8
-        }}>
-          <Text style={{ fontSize: 16 }}>{item.message}</Text>
-          <Text style={{ fontSize: 10, color: "gray" }}>{item.messageTime.toLocaleString()}</Text>
-        </View>
+        <TouchableOpacity onLongPress={() => onMessageLongPress(item)}>
+          <View 
+            style={{
+              borderWidth: 1,
+              borderColor: "gray",
+              borderRadius: 16,
+              padding: 8,
+              backgroundColor: "white",
+              marginVertical: 8
+            }}
+          >
+              <Text style={{ fontSize: 16 }}>{item.message}</Text>
+              <Text style={{ fontSize: 10, color: "gray" }}>{item.messageTime.toLocaleString()}</Text>
+          </View>
+        </TouchableOpacity>
       )}}
       keyExtractor={(item) => item.messageId}
     />
@@ -120,10 +175,59 @@ export default function Message() {
         value={message}
         onChangeText={setMessage}
       />
-      <TouchableOpacity onPress={sendMessage}>
-        <Ionicons name="send" size={24} color="black" style={{ marginHorizontal: 10 }}/>
+      <TouchableOpacity onPress={sendMessage} disabled={message.length == 0}>
+        <Ionicons
+          name={isInEditMode ? "pencil" : "send"} size={24}
+          color={message.length == 0 ? "gray" : "black"}
+          style={{ marginHorizontal: 10 }}
+        />
       </TouchableOpacity>
     </View>
+  )
+
+  const optionsModal = (
+    <BaseModal
+      visible={isOptionsModalVisible}
+      style={{ width: '80%' }}
+      onRequestClose={closeOptionsModal}
+    >
+        <TouchableOpacity
+          style={{ margin: 16 }}
+          onPress={onOptionsModalEditSelected}
+        >
+          <Text style={{ fontSize: 16, fontWeight: 'bold'}}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ margin: 16 }}
+          onPress={onOptionsModalDeleteSelected}
+        >
+          <Text style={{ fontSize: 16, fontWeight: 'bold'}}>Delete</Text>
+        </TouchableOpacity>
+    </BaseModal>
+  )
+  const confirmDeleteModal = (
+    <BaseModal
+      visible={isConfirmDeleteModalVisible}
+      onRequestClose={closeConfirmDeleteModal}
+    >
+      <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Confirm Delete Inbox</Text>
+      <Text style={{ marginVertical: 16 }}>Are you sure you want to this message? You will lose all data associated with it.</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+        <BaseButton
+          title="Delete"
+          style={{ backgroundColor: 'transparent'}}
+          textStyle={{color: 'darkorange', fontWeight: 'bold'}}
+          onPress={onConfirmDeleteModalConfirm}
+        />
+        <BaseButton
+          title="Cancel"
+          style={{ backgroundColor: 'transparent'}}
+          textStyle={{color: 'darkorange', fontWeight: 'bold'}}
+          onPress={closeConfirmDeleteModal}
+        />
+      </View>
+      
+    </BaseModal>
   )
 
   return (
@@ -134,6 +238,8 @@ export default function Message() {
       {messageContent}
       {messageInput}
       {isKeyboardVisible && <View style={{ height: 335 }} />}
+      {optionsModal}
+      {confirmDeleteModal}
     </KeyboardAvoidingView>
   );
 }
