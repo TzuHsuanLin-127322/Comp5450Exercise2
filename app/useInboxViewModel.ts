@@ -1,55 +1,48 @@
 import { InboxModel } from '@/models/Inbox'
+import {
+    addInbox as addInboxToService,
+    deleteInbox as deleteInboxToService,
+    fetchInbox as fetchInboxFromService,
+    updateInbox as updateInboxToService
+} from '@/models/mockData'
 import { useEffect, useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 import { ApiState } from '../models/ApiState'
 
-const mockIndox: InboxModel[] = [
-    {
-        inboxId: "str0235",
-        inboxName: "Family",
-        iconSymbol: "👨‍👩‍👦",
-        iconColor: "#00ff00",
-    }
-]
-
-
 export const useInboxViewModel = () => {
-    const [inbox, setInbox] = useState<InboxModel[]>([]) // TODO: Define Inbox Model
-    const [apiState, setApiState] = useState(ApiState.Initial) // TODO: Add API State
-    const [error, setError] = useState(null) // TODO: Define error state
+    const [inbox, setInbox] = useState<InboxModel[]>([])
+    const [apiState, setApiState] = useState(ApiState.Initial)
+    const [error, setError] = useState(null)
+
     const fetchInbox = async () => {
-        console.log("fetchInbox")
+        // console.log("fetchInbox")
         setApiState(ApiState.Loading)
-        try{
-            // setInbox(mockIndox)
+        const result = await fetchInboxFromService()
+        if (result) {
+            setInbox(result)
             setApiState(ApiState.Success)
-        } catch (error) {
-            // setError(error.msg)
+        } else {
             setApiState(ApiState.Error)
         }
     }
 
     const addInbox = async (newInbox: InboxModel) => {
+        // console.log("addInbox", newInbox)
         setApiState(ApiState.Loading)
-        newInbox.inboxId = uuidv4()
-        console.log("addInbox", newInbox)
-
-        try{
-            setInbox([...inbox, newInbox])
-            setApiState(ApiState.Success)
-        } catch (error) {
-            // setError(error.msg)
+        const result = await addInboxToService(newInbox)
+        if (result) {
+            await fetchInbox()
+        } else {
             setApiState(ApiState.Error)
         }
     }
 
     const editInbox = async (updatedInbox: InboxModel) => {
-        console.log("editInbox", updatedInbox)
+        // console.log("editInbox", updatedInbox)
         setApiState(ApiState.Loading)
-        try{
-            setInbox(inbox.map(inbox => inbox.inboxId === updatedInbox.inboxId ? updatedInbox : inbox))
-            setApiState(ApiState.Success)
-        } catch (error) {
+        const result = await updateInboxToService(updatedInbox)
+        if (result) {
+            await fetchInbox()
+        } else {
             // setError(error.msg)
             setApiState(ApiState.Error)
         }
@@ -58,11 +51,10 @@ export const useInboxViewModel = () => {
     const deleteInbox = async (inboxToBeDeleted: InboxModel) => {
         console.log("deleteInbox", inboxToBeDeleted.inboxId)
         setApiState(ApiState.Loading)
-        try{
-            setInbox(inbox.filter(inbox => inbox.inboxId !== inboxToBeDeleted.inboxId))
-            setApiState(ApiState.Success)
-        } catch (error) {
-            // setError(error.msg)
+        const result = await deleteInboxToService(inboxToBeDeleted)
+        if (result) {
+            await fetchInbox()
+        } else {
             setApiState(ApiState.Error)
         }
     }

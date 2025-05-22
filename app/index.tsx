@@ -1,6 +1,6 @@
 import { InboxModel } from "@/models/Inbox";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import 'react-native-get-random-values';
@@ -49,6 +49,15 @@ export default function Inbox() {
 
   const onInboxPress = (inbox: InboxModel) => {
     console.log("onInboxPress", inbox)
+    router.push({
+      pathname: '/message',
+      params: {
+        title: inbox.inboxName,
+        inboxId: inbox.inboxId,
+        iconColor: inbox.iconColor,
+        iconSymbol: inbox.iconSymbol
+      }
+    })
   }
 
   const onInboxLongPress = (inbox: InboxModel) => {
@@ -68,9 +77,6 @@ export default function Inbox() {
       deleteInbox(selectedInbox)
       setSelectedInbox(null)
     }
-  }
-
-  const onCancelDeleteInboxPress = () => {
   }
 
   const onLongClickMenuClose = () => {
