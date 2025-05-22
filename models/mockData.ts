@@ -18,7 +18,7 @@ export const mockMessages: MessageModel[] = [
         messageId: "str012344532346",
         inboxId: "str0235",
         message: "Hello, how are you?",
-        messageTime: new Date(),
+        messageTime: new Date("2025-05-19T00:00:00.000Z"),
     }
 ]
 
